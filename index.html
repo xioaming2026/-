@@ -7,52 +7,51 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fff;
             color: #333;
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        
+        /* 顶部导航 */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .top-title { font-size: 2rem; font-weight: 700; color: #333; }
+        .top-actions { display: flex; gap: 15px; align-items: center; }
 
-        /* 顶部标题 */
-        h1 {
-            font-size: 1.8rem;
-            color: #333;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
+        /* 视图切换按钮 */
+        .view-toggle { display: flex; gap: 5px; background: #f5f5f5; border-radius: 8px; padding: 4px; }
+        .view-btn { border: none; background: transparent; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; color: #666; }
+        .view-btn.active { background: #fff; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        /* 本子卡片 */
-        .notebooks {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
-        }
+        /* 本子视图 */
+        .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .list-view { display: flex; flex-direction: column; gap: 10px; }
         .notebook {
             background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 12px;
             padding: 20px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
-        .notebook:hover {
-            border-color: #b0b0b0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            transform: translateY(-2px);
-        }
-        .notebook h3 { font-size: 1.1rem; color: #222; margin-bottom: 6px; }
+        .list-view .notebook { display: flex; align-items: center; justify-content: space-between; }
+        .notebook:hover { border-color: #888; }
+        .notebook h3 { font-size: 1.2rem; margin-bottom: 5px; color: #222; }
         .notebook p { color: #999; font-size: 0.85rem; }
-
-        /* 页面卡片 */
-        .pages {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
+        .list-view .notebook h3 { margin: 0; }
+        
+        /* 页面视图 */
+        .pages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .pages-list { display: flex; flex-direction: column; gap: 10px; }
         .page {
             background: #fff;
             border: 1px solid #e0e0e0;
@@ -61,116 +60,102 @@
             cursor: pointer;
             transition: all 0.2s;
         }
+        .pages-list .page { display: flex; align-items: center; justify-content: space-between; }
         .page:hover { border-color: #888; }
-        .page h4 { color: #444; font-size: 0.95rem; margin-bottom: 5px; }
-        .page p { color: #aaa; font-size: 0.8rem; word-break: break-all; }
+        .page h4 { font-size: 1rem; margin-bottom: 4px; color: #444; }
+        .page p { color: #aaa; font-size: 0.85rem; word-break: break-all; }
+        .pages-list .page h4 { margin: 0; }
+        .pages-list .page p { margin: 0; }
 
-        /* 编辑区域 */
-        .editor {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 320px;
-            border: none;
-            outline: none;
-            font-size: 1rem;
-            font-family: inherit;
-            color: #333;
-            resize: vertical;
-            background: transparent;
-            line-height: 1.6;
-        }
+        /* 编辑页面（仿截图极简风格） */
+        #page-view { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; z-index: 100; display: flex; flex-direction: column; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f0f0f0; }
+        .editor-header .btn-icon { background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: #666; padding: 5px; }
+        .editor-meta { padding: 20px 20px 10px; }
+        .editor-title-input { width: 100%; border: none; outline: none; font-size: 2rem; font-weight: 700; color: #222; margin-bottom: 10px; }
+        .editor-meta-info { display: flex; align-items: center; gap: 10px; color: #888; font-size: 0.85rem; }
+        .tag-btn { background: #f0f0f0; border: none; border-radius: 15px; padding: 5px 12px; font-size: 0.8rem; color: #666; cursor: pointer; }
+        
+        .editor-body { flex: 1; padding: 0 20px; }
+        textarea { width: 100%; height: 100%; border: none; outline: none; font-size: 1.1rem; line-height: 1.7; color: #333; resize: none; font-family: inherit; }
 
-        /* 按钮 */
-        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .btn-primary { background: #333; color: #fff; }
-        .btn-primary:hover { background: #555; }
-        .btn-secondary { background: #fff; border: 1px solid #ccc; color: #333; }
-        .btn-secondary:hover { background: #f0f0f0; }
-        .btn-export { background: #fff; border: 1px solid #333; color: #333; }
-        .btn-export:hover { background: #f9f9f9; }
-
-        /* 返回链接 */
-        .back {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        .back:hover { color: #000; }
-
-        .hidden { display: none; }
-        .warning {
-            background: #fff3f3;
-            border: 1px solid #ffd6d6;
-            color: #d33;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.85rem;
-        }
+        .editor-footer { padding: 15px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .editor-footer .btn { padding: 10px 20px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; border: none; }
+        .btn-save { background: #333; color: #fff; }
+        .btn-export { background: #f5f5f5; color: #333; }
+        
+        .hidden { display: none !important; }
+        .warning { background: #fff3f3; border: 1px solid #ffd6d6; color: #d33; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.85rem; }
+        .back-btn { color: #555; text-decoration: none; font-size: 0.9rem; padding: 8px; border-radius: 6px; }
+        .back-btn:hover { background: #f5f5f5; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 主页 -->
         <div id="home-view">
-            <h1>📒 我的笔记本</h1>
-            <p class="subtitle">简单记录，清爽整理</p>
-            <div class="notebooks" id="notebook-list"></div>
+            <div class="top-bar">
+                <div class="top-title">📒 我的笔记本</div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="toggleNotebookView('grid')">宫格</button>
+                    <button class="view-btn" onclick="toggleNotebookView('list')">列表</button>
+                </div>
+            </div>
+            <div id="notebook-list" class="grid-view"></div>
         </div>
 
+        <!-- 本子内部 -->
         <div id="notebook-view" class="hidden">
-            <a href="#" class="back" onclick="showHome()">← 返回主页</a>
-            <h1 id="notebook-title"></h1>
-            <p class="subtitle" id="notebook-info"></p>
-            <div class="pages" id="page-list"></div>
-            <div class="btn-group">
-                <button class="btn btn-secondary" onclick="addPage()">+ 新建页</button>
-                <button class="btn btn-export" onclick="exportNotebookTxt()">📥 导出整个本子</button>
+            <div class="top-bar">
+                <a href="#" class="back-btn" onclick="showHome()">← 返回</a>
+                <div class="top-title" id="notebook-title"></div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="togglePageView('grid')">宫格</button>
+                    <button class="view-btn" onclick="togglePageView('list')">列表</button>
+                </div>
             </div>
+            <div id="page-list" class="pages-grid"></div>
+            <button class="btn btn-export" style="padding: 10px 20px; border-radius: 8px; background: #f5f5f5; border: 1px solid #ddd;" onclick="exportNotebookTxt()">📥 导出整个本子</button>
         </div>
 
+        <!-- 编辑页面（仿截图） -->
         <div id="page-view" class="hidden">
-            <a href="#" class="back" onclick="showNotebook()">← 返回本子</a>
-            <h1 id="page-title"></h1>
-            <div class="editor">
-                <textarea id="page-content" placeholder="在这里写笔记...（最多500行）"></textarea>
+            <div class="editor-header">
+                <button class="btn-icon" onclick="showNotebook()">←</button>
+                <div>
+                    <button class="btn-icon" onclick="exportPageTxt()">📤</button>
+                    <button class="btn-icon" onclick="savePage()">✓</button>
+                </div>
             </div>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="savePage()">💾 保存</button>
-                <button class="btn btn-export" onclick="exportPageTxt()">📥 导出当前页</button>
+            <div class="editor-meta">
+                <input type="text" class="editor-title-input" id="page-title" placeholder="标题" value="无标题">
+                <div class="editor-meta-info">
+                    <span id="page-date">今天 中午12:41</span>
+                    <button class="tag-btn">未分类 ▼</button>
+                </div>
             </div>
-            <div class="warning" id="line-warning" style="display:none;">⚠️ 内容超过500行，请精简后保存！</div>
+            <div class="editor-body">
+                <textarea id="page-content" placeholder="开始输入..."></textarea>
+            </div>
+            <div class="editor-footer">
+                <button class="btn btn-export" onclick="exportPageTxt()">📥 导出</button>
+                <button class="btn btn-save" onclick="savePage()">保存</button>
+            </div>
+            <div class="warning" id="line-warning" style="display:none; margin: 20px;">⚠️ 内容超过500行，请精简后保存！</div>
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'my_notes_app';
-        let state = { currentNotebook: 0, currentPage: 0 };
+        const STORAGE_KEY = 'my_notes_app'; // 保持不变，数据不会丢失
+        let state = { currentNotebook: 0, currentPage: 0, nbView: 'grid', pgView: 'grid' };
 
         function loadData() {
             const data = localStorage.getItem(STORAGE_KEY);
+            // 兼容旧数据格式，保证原有数据不丢失
             return data ? JSON.parse(data) : { notebooks: Array.from({ length: 5 }, (_, i) => ({ name: `本子${i + 1}`, pages: Array.from({ length: 5 }, () => '') })) };
         }
 
-        function saveData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
+        function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
         function showHome() {
             document.getElementById('home-view').classList.remove('hidden');
@@ -193,14 +178,37 @@
             renderPage();
         }
 
+        /* 视图切换功能 */
+        function toggleNotebookView(view) {
+            state.nbView = view;
+            const list = document.getElementById('notebook-list');
+            list.className = view === 'grid' ? 'grid-view' : 'list-view';
+            const btns = document.querySelectorAll('.view-btn');
+            btns[0].classList.toggle('active', view === 'grid');
+            btns[1].classList.toggle('active', view === 'list');
+        }
+
+        function togglePageView(view) {
+            state.pgView = view;
+            const list = document.getElementById('page-list');
+            list.className = view === 'grid' ? 'pages-grid' : 'pages-list';
+            const btns = document.querySelectorAll('.view-btn');
+            btns[0].classList.toggle('active', view === 'grid');
+            btns[1].classList.toggle('active', view === 'list');
+        }
+
+        /* 渲染 */
         function renderNotebooks() {
             const data = loadData();
             const list = document.getElementById('notebook-list');
             list.innerHTML = '';
             data.notebooks.forEach((nb, idx) => {
                 list.innerHTML += `<div class="notebook" onclick="selectNotebook(${idx})">
-                    <h3>📘 ${nb.name}</h3>
-                    <p>${nb.pages.filter(p => p.trim() !== '').length} / 5 页已写</p>
+                    <div>
+                        <h3>📘 ${nb.name}</h3>
+                        <p>${nb.pages.filter(p => p.trim() !== '').length} / 5 页已写</p>
+                    </div>
+                    <span style="font-size: 1.2rem; color: #ccc;">›</span>
                 </div>`;
             });
         }
@@ -209,14 +217,16 @@
             const data = loadData();
             const nb = data.notebooks[state.currentNotebook];
             document.getElementById('notebook-title').textContent = nb.name;
-            document.getElementById('notebook-info').textContent = `${nb.pages.filter(p => p.trim() !== '').length} / 5 页已写`;
             const list = document.getElementById('page-list');
             list.innerHTML = '';
             nb.pages.forEach((p, idx) => {
                 const preview = p.trim() ? p.substring(0, 20) + (p.length > 20 ? '...' : '') : '空页';
                 list.innerHTML += `<div class="page" onclick="selectPage(${idx})">
-                    <h4>第 ${idx + 1} 页</h4>
-                    <p>${preview}</p>
+                    <div>
+                        <h4>第 ${idx + 1} 页</h4>
+                        <p>${preview}</p>
+                    </div>
+                    <span style="font-size: 1.2rem; color: #ccc;">›</span>
                 </div>`;
             });
         }
@@ -224,20 +234,14 @@
         function renderPage() {
             const data = loadData();
             const p = data.notebooks[state.currentNotebook].pages[state.currentPage];
-            document.getElementById('page-title').textContent = `${data.notebooks[state.currentNotebook].name} · 第${state.currentPage + 1}页`;
+            document.getElementById('page-title').value = `${data.notebooks[state.currentNotebook].name} 第${state.currentPage + 1}页`;
+            document.getElementById('page-date').textContent = '今天 12:41'; // 简单模拟时间
             document.getElementById('page-content').value = p;
             document.getElementById('line-warning').style.display = 'none';
         }
 
         function selectNotebook(idx) { state.currentNotebook = idx; showNotebook(); }
         function selectPage(idx) { state.currentPage = idx; showPage(); }
-
-        function addPage() {
-            const data = loadData();
-            const nb = data.notebooks[state.currentNotebook];
-            if (nb.pages.length >= 5) return alert('每个本子最多5页！');
-            nb.pages.push(''); saveData(data); renderPages();
-        }
 
         function savePage() {
             const content = document.getElementById('page-content').value;
@@ -250,18 +254,13 @@
             data.notebooks[state.currentNotebook].pages[state.currentPage] = content;
             saveData(data);
             alert('保存成功！');
+            showNotebook(); // 保存后返回本子界面
         }
 
         function exportPageTxt() {
             const data = loadData();
             const content = data.notebooks[state.currentNotebook].pages[state.currentPage];
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${data.notebooks[state.currentNotebook].name}-第${state.currentPage + 1}页.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
+            exportFile(content, `${data.notebooks[state.currentNotebook].name}-第${state.currentPage + 1}页.txt`);
         }
 
         function exportNotebookTxt() {
@@ -271,15 +270,20 @@
             nb.pages.forEach((p, idx) => {
                 content += `—— 第${idx + 1}页 ——\n${p}\n\n`;
             });
+            exportFile(content, `${nb.name}.txt`);
+        }
+
+        function exportFile(content, filename) {
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${nb.name}.txt`;
+            a.download = filename;
             a.click();
             URL.revokeObjectURL(url);
         }
 
+        // 初始化
         showHome();
     </script>
 </body>
