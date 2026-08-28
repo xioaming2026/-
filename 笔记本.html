@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的5本5页笔记本</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f0c29, #1a1a3e, #24243e); color: #fff; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 20px; font-size: 1.8rem; }
+        .notebooks { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .notebook { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 15px; cursor: pointer; transition: 0.3s; }
+        .notebook:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+        .notebook h3 { margin-bottom: 8px; font-size: 1.1rem; }
+        .notebook p { color: #aaa; font-size: 0.85rem; }
+        .pages { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .page { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; cursor: pointer; transition: 0.3s; }
+        .page:hover { background: rgba(255,255,255,0.15); }
+        .page h4 { font-size: 1rem; margin-bottom: 5px; }
+        .page p { color: #999; font-size: 0.8rem; word-break: break-all; }
+        textarea { width: 100%; height: 300px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 15px; color: #fff; font-size: 1rem; resize: vertical; margin-bottom: 15px; }
+        .btn { padding: 10px 20px; background: linear-gradient(90deg, #00d2ff, #3a7bd5); border: none; border-radius: 8px; color: #fff; font-size: 1rem; cursor: pointer; margin-right: 10px; }
+        .btn:hover { opacity: 0.8; }
+        .hidden { display: none; }
+        .back { color: #00d2ff; text-decoration: none; display: inline-block; margin-bottom: 15px; font-size: 0.9rem; }
+        .warning { background: rgba(255, 99, 71, 0.2); border: 1px solid rgba(255, 99, 71, 0.5); padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="home-view">
+            <h1>📒 我的笔记本</h1>
+            <div class="notebooks" id="notebook-list"></div>
+        </div>
+
+        <div id="notebook-view" class="hidden">
+            <a href="#" class="back" onclick="showHome()">← 返回</a>
+            <h2 id="notebook-title"></h2>
+            <div class="pages" id="page-list"></div>
+            <button class="btn" onclick="addPage()">+ 新建页</button>
+        </div>
+
+        <div id="page-view" class="hidden">
+            <a href="#" class="back" onclick="showNotebook()">← 返回</a>
+            <h3 id="page-title"></h3>
+            <textarea id="page-content" placeholder="在这里写笔记...（最多500行）"></textarea>
+            <button class="btn" onclick="savePage()">保存</button>
+            <div class="warning" id="line-warning" style="display:none;">⚠️ 内容超过500行，请精简后保存！</div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'my_notes_app';
+        let state = { currentNotebook: 0, currentPage: 0 };
+
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { notebooks: Array.from({ length: 5 }, (_, i) => ({ name: `本子${i + 1}`, pages: Array.from({ length: 5 }, () => '') })) };
+        }
+
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function showHome() {
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('notebook-view').classList.add('hidden');
+            document.getElementById('page-view').classList.add('hidden');
+            renderNotebooks();
+        }
+
+        function showNotebook() {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('notebook-view').classList.remove('hidden');
+            document.getElementById('page-view').classList.add('hidden');
+            renderPages();
+        }
+
+        function showPage() {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('notebook-view').classList.add('hidden');
+            document.getElementById('page-view').classList.remove('hidden');
+            renderPage();
+        }
+
+        function renderNotebooks() {
+            const data = loadData();
+            const list = document.getElementById('notebook-list');
+            list.innerHTML = '';
+            data.notebooks.forEach((nb, idx) => {
+                list.innerHTML += `<div class="notebook" onclick="selectNotebook(${idx})">
+                    <h3>📘 ${nb.name}</h3>
+                    <p>${nb.pages.filter(p => p.trim() !== '').length} / 5 页已写</p>
+                </div>`;
+            });
+        }
+
+        function renderPages() {
+            const data = loadData();
+            const nb = data.notebooks[state.currentNotebook];
+            document.getElementById('notebook-title').textContent = nb.name;
+            const list = document.getElementById('page-list');
+            list.innerHTML = '';
+            nb.pages.forEach((p, idx) => {
+                const preview = p.trim() ? p.substring(0, 20) + (p.length > 20 ? '...' : '') : '空页';
+                list.innerHTML += `<div class="page" onclick="selectPage(${idx})">
+                    <h4>第 ${idx + 1} 页</h4>
+                    <p>${preview}</p>
+                </div>`;
+            });
+        }
+
+        function renderPage() {
+            const data = loadData();
+            const p = data.notebooks[state.currentNotebook].pages[state.currentPage];
+            document.getElementById('page-title').textContent = `本子${state.currentNotebook + 1} · 第${state.currentPage + 1}页`;
+            document.getElementById('page-content').value = p;
+            document.getElementById('line-warning').style.display = 'none';
+        }
+
+        function selectNotebook(idx) { state.currentNotebook = idx; showNotebook(); }
+        function selectPage(idx) { state.currentPage = idx; showPage(); }
+
+        function addPage() {
+            const data = loadData();
+            const nb = data.notebooks[state.currentNotebook];
+            if (nb.pages.length >= 5) return alert('每个本子最多5页！');
+            nb.pages.push(''); saveData(data); renderPages();
+        }
+
+        function savePage() {
+            const content = document.getElementById('page-content').value;
+            const lines = content.split('\n').length;
+            if (lines > 500) {
+                document.getElementById('line-warning').style.display = 'block';
+                return;
+            }
+            const data = loadData();
+            data.notebooks[state.currentNotebook].pages[state.currentPage] = content;
+            saveData(data);
+            alert('保存成功！');
+        }
+
+        showHome();
+    </script>
+</body>
+</html>
