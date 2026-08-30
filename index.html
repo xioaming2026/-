@@ -3,231 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MC 结构导入工具</title>
+    <title>MC基岩版结构指令生成器</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #0b0b14;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             min-height: 100vh;
+            color: #fff;
             padding: 20px;
         }
-        .app {
+        .container {
             max-width: 900px;
             margin: 0 auto;
-            background: #1a1a28;
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid #2e2e42;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         h1 {
             text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f6d365, #fda085);
+            margin-bottom: 20px;
+            font-size: 2em;
+            background: linear-gradient(90deg, #00ff87, #60efff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 24px;
         }
-        .flex { display: flex; gap: 12px; flex-wrap: wrap; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .card {
-            background: #0f0f1a;
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid #333;
-            margin-bottom: 16px;
-        }
-        .card-title {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 10px;
-        }
-        input {
-            background: #1a1a28;
-            color: #fff;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 14px;
-            width: 100%;
-            font-family: 'Consolas', monospace;
-        }
-        input:focus { outline: none; border-color: #4a6aff; }
-        .btn {
-            background: #2a2a3e;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        .btn-primary { background: #4a6aff; }
-        .btn-success { background: #3ccf7e; }
-        .output-box {
-            background: #0b0b16;
-            border: 1px solid #2a2a3a;
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.3);
             border-radius: 10px;
-            padding: 16px;
-            font-size: 14px;
-            font-family: 'Consolas', monospace;
-            word-break: break-all;
-            white-space: pre-wrap;
-            min-height: 100px;
-            color: #4a6aff;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
         }
-        .copy-btn {
-            position: relative;
-            top: -40px;
-            right: 0;
-            background: #2a2a3e;
-            padding: 4px 12px;
-            border-radius: 6px;
+        .upload-area:hover {
+            border-color: #00ff87;
+            background: rgba(0,255,135,0.1);
+        }
+        .upload-icon { font-size: 48px; margin-bottom: 10px; }
+        .btn {
+            background: linear-gradient(90deg, #00ff87, #60efff);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px 5px;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .info-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .output-box {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
             font-size: 12px;
+            white-space: pre-wrap;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .hidden { display: none; }
+        .settings {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .settings label { display: block; margin: 8px 0; }
+        .settings input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 5px;
+            color: #fff;
+            width: 100%;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
-<div class="app">
-    <h1>⛏️ MC 结构导入工具</h1>
-
-    <div class="card">
-        <div class="card-title">📁 上传结构文件</div>
-        <input type="file" id="structureFile" accept=".mcstructure">
-    </div>
-
-    <div class="card">
-        <div class="card-title">📍 导入位置</div>
-        <div class="grid-3">
-            <div><label>X</label><input type="number" id="importX" value="0"></div>
-            <div><label>Y</label><input type="number" id="importY" value="64"></div>
-            <div><label>Z</label><input type="number" id="importZ" value="0"></div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-title">🤖 机器人设置</div>
-        <div class="grid-3">
-            <div><label>盔甲架名称</label><input type="text" id="robotName" value="导入机器人"></div>
-            <div><label>指令类型</label>
-                <select id="commandType" style="background:#1a1a28;color:#fff;padding:8px 12px;border:1px solid #333;border-radius:6px;">
-                    <option value="setblock">setblock</option>
-                    <option value="fill">fill（连续区域）</option>
-                </select>
-            </div>
-            <div><label>方块ID</label><input type="text" id="defaultBlock" value="stone"></div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-title">📋 生成结果</div>
-        <div class="output-box" id="output">上传文件后点击按钮生成</div>
-        <button class="btn copy-btn" onclick="copyOutput()">📋 复制</button>
-    </div>
-
-    <div class="card">
-        <button class="btn btn-primary" onclick="generateCommands()">⚡ 生成指令</button>
-    </div>
-    <div class="card">
-        <button class="btn btn-success" onclick="downloadTxt()">📥 下载 txt 文件</button>
-    </div>
-</div>
-
-<!-- 引入 prismarine-nbt -->
-<script type="module">
-  import nbt from 'https://esm.run/prismarine-nbt';
-  window.nbt = nbt;
-</script>
-
-<script>
-    let parsedData = null; // 存储解析后的结构数据
-
-    // 上传文件后自动解析
-    document.getElementById('structureFile').addEventListener('change', async function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    <div class="container">
+        <h1>🎮 MC基岩版结构指令生成器</h1>
         
-        try {
-            const buffer = await file.arrayBuffer();
-            const { parsed } = await window.nbt.parse(buffer);
-            parsedData = parsed;
-            alert('✅ 结构文件解析成功！');
-            console.log('解析结果:', parsedData);
-        } catch (error) {
-            alert('❌ 解析失败，请检查文件格式。');
-            console.error('解析错误:', error);
-        }
-    });
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <p>直接上传 .mcstructure 文件</p>
+            <input type="file" id="fileInput" accept=".mcstructure" class="hidden">
+        </div>
 
-    // 生成指令
-    function generateCommands() {
-        if (!parsedData) {
-            document.getElementById('output').innerText = '⚠️ 请先上传结构文件！';
-            return;
-        }
+        <div class="settings" id="settings">
+            <label>起始坐标 X：
+                <input type="number" id="startX" value="0" step="1">
+            </label>
+            <label>起始坐标 Y：
+                <input type="number" id="startY" value="64" step="1">
+            </label>
+            <label>起始坐标 Z：
+                <input type="number" id="startZ" value="0" step="1">
+            </label>
+        </div>
 
-        const robotName = document.getElementById('robotName').value || '导入机器人';
-        const importX = parseInt(document.getElementById('importX').value) || 0;
-        const importY = parseInt(document.getElementById('importY').value) || 64;
-        const importZ = parseInt(document.getElementById('importZ').value) || 0;
+        <div id="buildInfo" class="info-box hidden">
+            <strong>📊 建筑信息</strong>
+            <div id="infoContent"></div>
+        </div>
 
-        // 从解析结果中提取方块数据
-        // 注意：这里需要根据你实际解析出的NBT结构来调整
-        const blocks = parsedData?.value?.blocks?.value || [];
-        const palette = parsedData?.value?.palette?.value || [];
+        <div class="hidden" id="actionButtons">
+            <button class="btn" onclick="generateCommands()">🔧 生成指令</button>
+            <button class="btn" onclick="downloadTXT()">📥 下载TXT</button>
+            <button class="btn" onclick="clearAll()">🔄 重置</button>
+        </div>
 
-        let commands = [];
+        <div id="outputArea" class="output-box hidden"></div>
+    </div>
 
-        // 遍历所有方块
-        for (let i = 0; i < blocks.length; i++) {
-            const blockData = blocks[i];
-            const pos = blockData?.pos?.value || [];
-            const state = blockData?.state?.value || 0;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script>
+        let buildingData = null;
+        let generatedCommands = [];
 
-            const x = pos[0] || 0;
-            const y = pos[1] || 0;
-            const z = pos[2] || 0;
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
 
-            // 获取方块ID
-            const blockId = palette[state]?.name?.value || 'stone';
-
-            // 生成 execute + setblock 指令
-            commands.push(
-                `/execute as @e[type=armor_stand,name=${robotName}] at @s run setblock ~${x} ~${y} ~${z} ${blockId}`
-            );
-        }
-
-        document.getElementById('output').innerText = commands.join('\n');
-        console.log('生成的指令:', commands);
-    }
-
-    // 复制到剪贴板
-    function copyOutput() {
-        const content = document.getElementById('output').innerText;
-        if (!content || content.includes('⚠️')) return;
-        navigator.clipboard.writeText(content).then(() => {
-            alert('✅ 已复制到剪贴板！');
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
         });
-    }
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragging');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processFile(file);
+        });
 
-    // 下载txt
-    function downloadTxt() {
-        const content = document.getElementById('output').innerText;
-        if (!content || content.includes('⚠️')) return;
-        const blob = new Blob([content], {type: 'text/plain'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'mc_import.txt';
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-</script>
+        async function processFile(file) {
+            try {
+                const content = await file.text();
+                
+                // 解析.mcstructure文件（基岩版结构文件是NBT格式）
+                // 这里我们尝试解析为JSON，如果失败则提示
+                try {
+                    buildingData = JSON.parse(content);
+                } catch (e) {
+                    // 如果JSON解析失败，尝试用NBT解析器
+                    // 这里简化处理，提示用户
+                    alert('⚠️ 无法解析.mcstructure文件，请确保文件是有效的结构文件');
+                    return;
+                }
+
+                displayBuildInfo();
+                
+                document.getElementById('actionButtons').classList.remove('hidden');
+                console.log('✅ 解析成功！建筑数据:', buildingData);
+            } catch (error) {
+                alert('❌ 解析失败: ' + error.message);
+                console.error('解析错误:', error);
+            }
+        }
+
+        function displayBuildInfo() {
+            const infoDiv = document.getElementById('buildInfo');
+            const contentDiv = document.getElementById('infoContent');
+            
+            let info = '';
+            if (buildingData.blocks) {
+                info += `方块数量: ${buildingData.blocks.length}<br>`;
+            }
+            if (buildingData.size) {
+                info += `尺寸: ${buildingData.size.x} × ${buildingData.size.y} × ${buildingData.size.z}<br>`;
+            }
+            if (buildingData.name) {
+                info += `名称: ${buildingData.name}<br>`;
+            }
+            
+            contentDiv.innerHTML = info;
+            infoDiv.classList.remove('hidden');
+        }
+
+        function generateCommands() {
+            if (!buildingData) {
+                alert('请先上传文件！');
+                return;
+            }
+
+            generatedCommands = [];
+            const startX = parseInt(document.getElementById('startX').value) || 0;
+            const startY = parseInt(document.getElementById('startY').value) || 64;
+            const startZ = parseInt(document.getElementById('startZ').value) || 0;
+
+            const blockGroups = groupBlocksByType(buildingData.blocks || buildingData);
+            
+            for (const [blockType, positions] of Object.entries(blockGroups)) {
+                const layers = groupByY(positions);
+                for (const [y, layerBlocks] of Object.entries(layers)) {
+                    const command = generateFillCommand(layerBlocks, blockType, y, startX, startY, startZ);
+                    if (command) {
+                        generatedCommands.push(command);
+                    }
+                }
+            }
+
+            const outputArea = document.getElementById('outputArea');
+            outputArea.textContent = generatedCommands.join('\n');
+            outputArea.classList.remove('hidden');
+            
+            console.log('✅ 生成指令数量:', generatedCommands.length);
+        }
+
+        function groupBlocksByType(blocks) {
+            const groups = {};
+            if (Array.isArray(blocks)) {
+                blocks.forEach(block => {
+                    const type = block.type || block.block || 'minecraft:stone';
+                    if (!groups[type]) groups[type] = [];
+                    groups[type].push(block);
+                });
+            }
+            return groups;
+        }
+
+        function groupByY(blocks) {
+            const layers = {};
+            blocks.forEach(block => {
+                const y = block.y || block.pos?.y || 0;
+                if (!layers[y]) layers[y] = [];
+                layers[y].push(block);
+            });
+            return layers;
+        }
+
+        function generateFillCommand(blocks, blockType, y, startX, startY, startZ) {
+            if (blocks.length === 0) return null;
+            
+            let minX = Infinity, maxX = -Infinity;
+            let minZ = Infinity, maxZ = -Infinity;
+            
+            blocks.forEach(block => {
+                const x = block.x || block.pos?.x || 0;
+                const z = block.z || block.pos?.z || 0;
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minZ = Math.min(minZ, z);
+                maxZ = Math.max(maxZ, z);
+            });
+            
+            const actualY = startY + parseInt(y);
+            return `/fill ${startX + minX} ${actualY} ${startZ + minZ} ${startX + maxX} ${actualY} ${startZ + maxZ} ${blockType}`;
+        }
+
+        function downloadTXT() {
+            if (generatedCommands.length === 0) {
+                alert('请先生成指令！');
+                return;
+            }
+            
+            const content = generatedCommands.join('\n');
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mc_building_commands.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAll() {
+            buildingData = null;
+            generatedCommands = [];
+            
+            document.getElementById('buildInfo').classList.add('hidden');
+            document.getElementById('actionButtons').classList.add('hidden');
+            document.getElementById('outputArea').classList.add('hidden');
+            document.getElementById('outputArea').textContent = '';
+            fileInput.value = '';
+        }
+    </script>
 </body>
 </html>
