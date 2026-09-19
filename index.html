@@ -329,4 +329,121 @@
         var progress = (currentIndex + 1) + " / " + questions.length;
 
         var optionsHtml = "";
-        for 
+        for (var i = 0; i < q.options.length; i++) {
+          var scoreValue = optionScores[i];
+          var isSelected = (selectedScore === scoreValue);
+          optionsHtml += '<div class="option-btn ' + (isSelected ? 'selected' : '') + '" data-score="' + scoreValue + '">' +
+            '<span>' + q.options[i] + '</span>' +
+            '<span class="score-hint">' + scoreHints[i] + '</span>' +
+            '</div>';
+        }
+
+        var hasAnswer = (selectedScore !== null);
+        var isFirst = (currentIndex === 0);
+        var isLast = (currentIndex === questions.length - 1);
+
+        var prevDisabled = isFirst ? 'disabled' : '';
+        var nextDisabled = hasAnswer ? '' : 'disabled';
+        var nextButtonText = isLast ? '✨ 查看结果' : '下一题 →';
+
+        app.innerHTML =
+          '<div class="fade-in">' +
+            '<h1>🌿 心境自测 <span>20题</span></h1>' +
+            '<div class="subhead">' +
+              '<span>如实回答，没有对错</span>' +
+              '<span class="progress-badge">' + progress + '</span>' +
+            '</div>' +
+            '<div class="question-area">' +
+              '<div class="question-text">' + q.text + '</div>' +
+              '<div class="options-grid" id="optionsGrid">' + optionsHtml + '</div>' +
+            '</div>' +
+            '<div class="nav-buttons">' +
+              '<button class="btn btn-secondary" id="prevBtn" ' + prevDisabled + '>← 上一题</button>' +
+              '<button class="btn btn-primary" id="nextBtn" ' + nextDisabled + '>' + nextButtonText + '</button>' +
+            '</div>' +
+            '<div class="footer-note">根据最近两周的真实感受选择</div>' +
+          '</div>';
+
+        var optionBtns = document.querySelectorAll('.option-btn');
+        for (var j = 0; j < optionBtns.length; j++) {
+          optionBtns[j].addEventListener('click', (function(idx) {
+            return function() {
+              var score = parseInt(this.getAttribute('data-score'), 10);
+              answers[currentIndex] = score;
+              render();
+            };
+          })(j));
+        }
+
+        var prevBtn = document.getElementById('prevBtn');
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            if (currentIndex > 0) {
+              currentIndex--;
+              render();
+            }
+          });
+        }
+
+        var nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            if (answers[currentIndex] === null) return;
+            if (currentIndex === questions.length - 1) {
+              gameFinished = true;
+              render();
+            } else {
+              currentIndex++;
+              render();
+            }
+          });
+        }
+      }
+
+      function renderResult() {
+        var totalScore = computeTotal();
+        var interpretation = getInterpretation(totalScore);
+        var maxScore = 60;
+        var tenPointScale = (totalScore / 6).toFixed(1);
+
+        var severity = '';
+        if (tenPointScale <= 1.0) severity = '正常范围';
+        else if (tenPointScale <= 3.0) severity = '正常偏高 / 轻度';
+        else if (tenPointScale <= 6.0) severity = '中度';
+        else if (tenPointScale <= 8.0) severity = '中重度';
+        else severity = '重度';
+
+        var inNormalRange = (tenPointScale >= 1.0 && tenPointScale <= 3.0);
+        var normalNote = inNormalRange ? '✅ 处于正常范围 (1-3分)' : '⚠️ 超出正常范围 (1-3分)';
+
+        app.innerHTML =
+          '<div class="result-card fade-in">' +
+            '<h1 style="justify-content: center; margin-bottom: 1.2rem;">📋 你的心境报告</h1>' +
+            '<div class="result-score">' + tenPointScale + '<span style="font-size: 1.8rem; font-weight: 400; color: #7a6790;">/10</span></div>' +
+            '<div class="result-label">抑郁指数（十分制）</div>' +
+            '<div class="scale-note">' + normalNote + ' · 原始分 ' + totalScore + '/' + maxScore + '</div>' +
+            '<div class="interpretation">' + interpretation + '</div>' +
+            '<div style="font-size: 0.95rem; color: #5b4970; margin-bottom: 1.2rem; background: #e9defa; padding: 0.5rem 1rem; border-radius: 3rem; display: inline-block;">' +
+              severity +
+            '</div>' +
+            '<div>' +
+              '<button class="restart-btn" id="restartBtn">🔄 重新测试</button>' +
+            '</div>' +
+            '<div class="footer-note" style="margin-top: 1.5rem;">' +
+              '此测评基于常见抑郁自评量表，仅供参考，不能替代专业诊断。' +
+            '</div>' +
+          '</div>';
+
+        document.getElementById('restartBtn').addEventListener('click', function() {
+          currentIndex = 0;
+          answers = new Array(20).fill(null);
+          gameFinished = false;
+          render();
+        });
+      }
+
+      render();
+    })();
+  </script>
+</body>
+</html>
