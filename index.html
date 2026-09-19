@@ -1,306 +1,332 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MC基岩版结构指令生成器</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            min-height: 100vh;
-            color: #fff;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2em;
-            background: linear-gradient(90deg, #00ff87, #60efff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .upload-area {
-            border: 2px dashed rgba(255,255,255,0.3);
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-        }
-        .upload-area:hover {
-            border-color: #00ff87;
-            background: rgba(0,255,135,0.1);
-        }
-        .upload-icon { font-size: 48px; margin-bottom: 10px; }
-        .btn {
-            background: linear-gradient(90deg, #00ff87, #60efff);
-            color: #1a1a2e;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin: 10px 5px;
-        }
-        .btn:hover { transform: scale(1.05); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .info-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            font-size: 14px;
-        }
-        .output-box {
-            background: #1a1a2e;
-            border-radius: 8px;
-            padding: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            margin: 15px 0;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .hidden { display: none; }
-        .settings {
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .settings label { display: block; margin: 8px 0; }
-        .settings input {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px;
-            border-radius: 5px;
-            color: #fff;
-            width: 100%;
-            margin-top: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>心境自测 · 问答游戏</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f7f3ff 0%, #e8e0f5 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .game-container {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+      padding: 2rem 1.8rem 2.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: all 0.2s ease;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #2b1b3a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+    h1 span {
+      background: linear-gradient(135deg, #7c5cbf, #b18aff);
+      font-size: 1.6rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      color: white;
+      font-weight: 500;
+    }
+    .subhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      color: #5d4a6e;
+      font-weight: 400;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(150, 120, 180, 0.2);
+      padding-bottom: 0.75rem;
+    }
+    .progress-badge {
+      background: #ffffffcc;
+      backdrop-filter: blur(4px);
+      padding: 0.35rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4e3a62;
+      box-shadow: 0 4px 10px rgba(100, 70, 130, 0.08);
+      border: 1px solid #ffffff;
+    }
+    .question-area {
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .question-text {
+      font-size: 1.45rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: #20162b;
+      margin-bottom: 1rem;
+      padding: 0 0.25rem;
+      letter-spacing: -0.01em;
+    }
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    .option-btn {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1.5px solid rgba(160, 130, 200, 0.2);
+      border-radius: 1.5rem;
+      padding: 1rem 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #2f2140;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
+      text-align: left;
+      letter-spacing: -0.01em;
+    }
+    .option-btn:hover {
+      background: #ffffff;
+      border-color: #b89ae0;
+      transform: scale(1.01);
+      box-shadow: 0 12px 24px -8px rgba(120, 80, 180, 0.25);
+    }
+    .option-btn.selected {
+      background: #efe5ff;
+      border-color: #9b7fd4;
+      box-shadow: 0 0 0 2px #c7b0f0, 0 10px 20px -5px rgba(130, 90, 200, 0.3);
+      color: #1f102e;
+      font-weight: 500;
+    }
+    .option-btn .score-hint {
+      font-size: 0.8rem;
+      background: #e4d5fc;
+      color: #4f3570;
+      padding: 0.25rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 500;
+      transition: all 0.1s;
+    }
+    .option-btn.selected .score-hint {
+      background: #ad8be0;
+      color: white;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.2rem;
+      gap: 1rem;
+    }
+    .btn {
+      border: none;
+      background: #ffffffd0;
+      backdrop-filter: blur(8px);
+      padding: 0.9rem 2rem;
+      border-radius: 3rem;
+      font-weight: 550;
+      font-size: 1rem;
+      color: #3c2b50;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      border: 1px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      flex: 1;
+      letter-spacing: -0.01em;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #8460c0, #a77ee0);
+      color: white;
+      border: none;
+      box-shadow: 0 12px 18px -6px #9b7fd4b0;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #7756b3, #9b72d6);
+      transform: translateY(-1px);
+      box-shadow: 0 18px 25px -8px #8460c0c0;
+    }
+    .btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.5);
+      box-shadow: none;
+    }
+    .btn-secondary:hover {
+      background: #ffffff;
+      border-color: #cbb8e6;
+    }
+    .result-card {
+      text-align: center;
+      padding: 1rem 0.5rem 0.5rem;
+    }
+    .result-score {
+      font-size: 4.5rem;
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, #4b2e6b, #7d5ba6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 8px 16px rgba(120, 80, 180, 0.2));
+    }
+    .result-label {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #3b2b4b;
+      margin-bottom: 0.75rem;
+    }
+    .interpretation {
+      font-size: 1.05rem;
+      color: #4d3b5e;
+      background: #ffffffc9;
+      backdrop-filter: blur(8px);
+      padding: 1.2rem 1.5rem;
+      border-radius: 2rem;
+      border: 1px solid #ffffff;
+      margin: 0.5rem 0 1.4rem;
+      line-height: 1.5;
+      font-weight: 450;
+    }
+    .scale-note {
+      font-size: 0.85rem;
+      color: #7a6790;
+      background: #f2ecfc;
+      padding: 0.6rem 1rem;
+      border-radius: 3rem;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+      font-weight: 450;
+    }
+    .restart-btn {
+      background: #ffffffd0;
+      border: 1px solid #ffffff;
+      padding: 0.9rem 2rem;
+      border-radius: 3rem;
+      font-weight: 550;
+      font-size: 1rem;
+      color: #3c2b50;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .restart-btn:hover {
+      background: white;
+      transform: scale(1.01);
+      box-shadow: 0 14px 22px -8px #b59ad8;
+    }
+    .footer-note {
+      font-size: 0.7rem;
+      color: #988ab0;
+      text-align: center;
+      margin-top: 1.2rem;
+      border-top: 1px solid #e4d9f0;
+      padding-top: 0.8rem;
+      letter-spacing: 0.2px;
+    }
+    .fade-in {
+      animation: fade 0.3s ease;
+    }
+    @keyframes fade {
+      from { opacity: 0.3; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎮 MC基岩版结构指令生成器</h1>
-        
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📁</div>
-            <p>直接上传 .mcstructure 文件</p>
-            <input type="file" id="fileInput" accept=".mcstructure" class="hidden">
-        </div>
+  <div class="game-container" id="app"></div>
 
-        <div class="settings" id="settings">
-            <label>起始坐标 X：
-                <input type="number" id="startX" value="0" step="1">
-            </label>
-            <label>起始坐标 Y：
-                <input type="number" id="startY" value="64" step="1">
-            </label>
-            <label>起始坐标 Z：
-                <input type="number" id="startZ" value="0" step="1">
-            </label>
-        </div>
+  <script>
+    (function() {
+      'use strict';
 
-        <div id="buildInfo" class="info-box hidden">
-            <strong>📊 建筑信息</strong>
-            <div id="infoContent"></div>
-        </div>
+      var questions = [
+        { text: "1. 我感到情绪低落、难过或空虚。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "2. 我对以前喜欢的事情失去兴趣。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "3. 我感到疲惫，精力不足。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "4. 我入睡困难，或者睡得太多。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "5. 我食欲不振或暴饮暴食。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "6. 我觉得自己很失败，或让家人失望。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "7. 我很难集中注意力做事。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "8. 我行动或说话比平时迟缓。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "9. 我烦躁不安，比平时更易怒。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "10. 我觉得孤独，即使有人陪伴。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "11. 我对未来感到绝望。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "12. 我觉得自己毫无价值。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "13. 我回避社交活动或与人交往。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "14. 我经常哭泣或想哭。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "15. 我觉得身体沉重或疼痛，但查不出原因。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "16. 我难以做出决定，哪怕是很小的事。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "17. 我对批评或拒绝特别敏感。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "18. 我觉得活着很累，甚至想过消失。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "19. 我失去了幽默感，笑不出来。", options: ["很少或从不", "有时", "经常", "几乎总是"] },
+        { text: "20. 我很难感受到快乐或满足。", options: ["很少或从不", "有时", "经常", "几乎总是"] }
+      ];
 
-        <div class="hidden" id="actionButtons">
-            <button class="btn" onclick="generateCommands()">🔧 生成指令</button>
-            <button class="btn" onclick="downloadTXT()">📥 下载TXT</button>
-            <button class="btn" onclick="clearAll()">🔄 重置</button>
-        </div>
+      var optionScores = [0, 1, 2, 3];
+      var scoreHints = ["0分", "1分", "2分", "3分"];
 
-        <div id="outputArea" class="output-box hidden"></div>
-    </div>
+      var currentIndex = 0;
+      var answers = new Array(20).fill(null);
+      var gameFinished = false;
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script>
-        let buildingData = null;
-        let generatedCommands = [];
+      var app = document.getElementById('app');
 
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
+      function computeTotal() {
+        var sum = 0;
+        for (var i = 0; i < answers.length; i++) {
+          if (answers[i] !== null) sum += answers[i];
+        }
+        return sum;
+      }
 
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragging');
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragging');
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragging');
-            const file = e.dataTransfer.files[0];
-            if (file) processFile(file);
-        });
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) processFile(file);
-        });
+      function getInterpretation(score) {
+        if (score <= 3) return "🌱 正常范围。你的情绪状态较为平稳，似乎没有明显的抑郁倾向。继续保持积极的自我关怀。";
+        if (score <= 10) return "🍂 轻度困扰。你可能有一些情绪波动，但仍在常见范围内。可以尝试放松、运动或与朋友倾诉。";
+        if (score <= 20) return "🌧️ 中度抑郁可能。建议关注自己的情绪健康，考虑与信任的人聊聊，或寻求专业心理支持。";
+        if (score <= 30) return "⚠️ 中重度抑郁倾向。你并不孤单，很多人在类似时刻需要帮助。强烈建议联系心理医生或精神科专家。";
+        return "🆘 重度抑郁可能。请务必尽快寻求专业医疗帮助。你值得被关怀和支持，不要独自承受。";
+      }
 
-        async function processFile(file) {
-            try {
-                const content = await file.text();
-                
-                // 解析.mcstructure文件（基岩版结构文件是NBT格式）
-                // 这里我们尝试解析为JSON，如果失败则提示
-                try {
-                    buildingData = JSON.parse(content);
-                } catch (e) {
-                    // 如果JSON解析失败，尝试用NBT解析器
-                    // 这里简化处理，提示用户
-                    alert('⚠️ 无法解析.mcstructure文件，请确保文件是有效的结构文件');
-                    return;
-                }
-
-                displayBuildInfo();
-                
-                document.getElementById('actionButtons').classList.remove('hidden');
-                console.log('✅ 解析成功！建筑数据:', buildingData);
-            } catch (error) {
-                alert('❌ 解析失败: ' + error.message);
-                console.error('解析错误:', error);
-            }
+      function render() {
+        if (gameFinished) {
+          renderResult();
+          return;
         }
 
-        function displayBuildInfo() {
-            const infoDiv = document.getElementById('buildInfo');
-            const contentDiv = document.getElementById('infoContent');
-            
-            let info = '';
-            if (buildingData.blocks) {
-                info += `方块数量: ${buildingData.blocks.length}<br>`;
-            }
-            if (buildingData.size) {
-                info += `尺寸: ${buildingData.size.x} × ${buildingData.size.y} × ${buildingData.size.z}<br>`;
-            }
-            if (buildingData.name) {
-                info += `名称: ${buildingData.name}<br>`;
-            }
-            
-            contentDiv.innerHTML = info;
-            infoDiv.classList.remove('hidden');
-        }
+        var q = questions[currentIndex];
+        var selectedScore = answers[currentIndex];
+        var progress = (currentIndex + 1) + " / " + questions.length;
 
-        function generateCommands() {
-            if (!buildingData) {
-                alert('请先上传文件！');
-                return;
-            }
-
-            generatedCommands = [];
-            const startX = parseInt(document.getElementById('startX').value) || 0;
-            const startY = parseInt(document.getElementById('startY').value) || 64;
-            const startZ = parseInt(document.getElementById('startZ').value) || 0;
-
-            const blockGroups = groupBlocksByType(buildingData.blocks || buildingData);
-            
-            for (const [blockType, positions] of Object.entries(blockGroups)) {
-                const layers = groupByY(positions);
-                for (const [y, layerBlocks] of Object.entries(layers)) {
-                    const command = generateFillCommand(layerBlocks, blockType, y, startX, startY, startZ);
-                    if (command) {
-                        generatedCommands.push(command);
-                    }
-                }
-            }
-
-            const outputArea = document.getElementById('outputArea');
-            outputArea.textContent = generatedCommands.join('\n');
-            outputArea.classList.remove('hidden');
-            
-            console.log('✅ 生成指令数量:', generatedCommands.length);
-        }
-
-        function groupBlocksByType(blocks) {
-            const groups = {};
-            if (Array.isArray(blocks)) {
-                blocks.forEach(block => {
-                    const type = block.type || block.block || 'minecraft:stone';
-                    if (!groups[type]) groups[type] = [];
-                    groups[type].push(block);
-                });
-            }
-            return groups;
-        }
-
-        function groupByY(blocks) {
-            const layers = {};
-            blocks.forEach(block => {
-                const y = block.y || block.pos?.y || 0;
-                if (!layers[y]) layers[y] = [];
-                layers[y].push(block);
-            });
-            return layers;
-        }
-
-        function generateFillCommand(blocks, blockType, y, startX, startY, startZ) {
-            if (blocks.length === 0) return null;
-            
-            let minX = Infinity, maxX = -Infinity;
-            let minZ = Infinity, maxZ = -Infinity;
-            
-            blocks.forEach(block => {
-                const x = block.x || block.pos?.x || 0;
-                const z = block.z || block.pos?.z || 0;
-                minX = Math.min(minX, x);
-                maxX = Math.max(maxX, x);
-                minZ = Math.min(minZ, z);
-                maxZ = Math.max(maxZ, z);
-            });
-            
-            const actualY = startY + parseInt(y);
-            return `/fill ${startX + minX} ${actualY} ${startZ + minZ} ${startX + maxX} ${actualY} ${startZ + maxZ} ${blockType}`;
-        }
-
-        function downloadTXT() {
-            if (generatedCommands.length === 0) {
-                alert('请先生成指令！');
-                return;
-            }
-            
-            const content = generatedCommands.join('\n');
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'mc_building_commands.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function clearAll() {
-            buildingData = null;
-            generatedCommands = [];
-            
-            document.getElementById('buildInfo').classList.add('hidden');
-            document.getElementById('actionButtons').classList.add('hidden');
-            document.getElementById('outputArea').classList.add('hidden');
-            document.getElementById('outputArea').textContent = '';
-            fileInput.value = '';
-        }
-    </script>
-</body>
-</html>
+        var optionsHtml = "";
+        for 
